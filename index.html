@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">   
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="data.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>TreeTable</title>
+</head>
+<body>
+    <div class="table">
+        <button>Show only Active</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody id="table">
+            </tbody>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+
+        let parent;
+        $( document ).ready(function() {
+            let users = data;
+            let table = $('#table');
+            let dataToAppend = [];
+            let mainUsers = data.filter((user) => user.parentId === 0);
+
+            mainUsers.forEach(user => {
+                dataToAppend.push(
+                    `<tr class="parent" id="${user.id}" 
+                    onclick="toggleChildren(${user.id})">
+                        <td>${user.name}</td><td>${user.email}</td><td>${user.balance}</td>
+                    </tr>`)
+            });
+
+            table.append(dataToAppend);
+        });
+
+        function toggleChildren(parentId) {
+            if (parent !== parentId) {
+                let children = data.filter((user) => user.parentId === parentId);
+                childrenToAppend = [];
+
+                children.forEach(child => {
+                childrenToAppend.push(`<tr class="child" id="${child.id}" 
+                    onclick="toggleChildren(${child.id})">
+                    <td>${child.name}</td><td>${child.email}</td><td>${child.balance}</td>
+                </tr>`);
+                }); 
+
+                $(`#${parentId}`).after(childrenToAppend);
+            } 
+                parent = parentId;
+            }
+
+    </script>
+</body>
+</html>
