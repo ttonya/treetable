@@ -2,3 +2,11 @@
     background-color: lightgrey;
     padding-left: 30px;
 }
+
+tr {
+    cursor: pointer;
+}
+
+td {
+    padding: 5px 10px;
+}

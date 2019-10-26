@@ -1,68 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">   
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script type="text/javascript" src="index.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+    ></script>
     <script type="text/javascript" src="data.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
     <title>TreeTable</title>
-</head>
-<body>
+  </head>
+  <body>
     <div class="table">
-        <button>Show only Active</button>
+      <button 
+      onclick="filterUsers()">Filter Active
+      </button>
         <table>
             <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Balance</th>
-                </tr>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Balance</th>
+            </tr>
             </thead>
-            <tbody id="table">
-            </tbody>
+            <tbody id="table"></tbody>
         </table>
     </div>
 
     <script type="text/javascript">
+      let isActive;
+      let users = data;
 
-        let parent;
-        $( document ).ready(function() {
-            let users = data;
-            let table = $('#table');
-            let dataToAppend = [];
-            let mainUsers = data.filter((user) => user.parentId === 0);
+      $(document).ready(function() {
+        isActive = false;
+        let mainUsers = data.filter(user => user.parentId === 0);
+        showUsers(mainUsers);
+      });
 
-            mainUsers.forEach(user => {
-                dataToAppend.push(
-                    `<tr class="parent" id="${user.id}" 
+      function showUsers(usersToShow) {
+        let dataToAppend = [];
+        usersToShow.forEach(user => {
+          dataToAppend.push(
+            `<tr class="parent" id="${user.id}" 
                     onclick="toggleChildren(${user.id})">
                         <td>${user.name}</td><td>${user.email}</td><td>${user.balance}</td>
-                    </tr>`)
-            });
-
-            table.append(dataToAppend);
+                    </tr>`
+          );
         });
 
-        function toggleChildren(parentId) {
-            if (parent !== parentId) {
-                let children = data.filter((user) => user.parentId === parentId);
-                childrenToAppend = [];
+        $("#table").append(dataToAppend);
+      }
 
-                children.forEach(child => {
-                childrenToAppend.push(`<tr class="child" id="${child.id}" 
+      function toggleChildren(parentId) {
+        if ($(`.${parentId}`).length === 0) {
+          let children = isActive
+            ? data.filter(user => user.parentId === parentId && user.isActive)
+            : data.filter(user => user.parentId === parentId);
+
+          let childrenToAppend = [];
+
+          children.forEach(child => {
+            childrenToAppend.push(`<tr class="child ${parentId}" id="${child.id}" 
                     onclick="toggleChildren(${child.id})">
                     <td>${child.name}</td><td>${child.email}</td><td>${child.balance}</td>
                 </tr>`);
-                }); 
+          });
 
-                $(`#${parentId}`).after(childrenToAppend);
-            } 
-                parent = parentId;
-            }
+          $(`#${parentId}`).after(childrenToAppend);
+        } else {
+          $(`.${parentId}`).remove();
+        }
+      }
 
+      function filterUsers() {
+        isActive = !isActive;
+        $("#table").empty();
+        if (isActive) {
+          filteredUsers = data.filter(
+            user => user.isActive && user.parentId === 0
+          );
+        } else {
+          filteredUsers = data.filter(user => user.parentId === 0);
+        }
+
+        showUsers(filteredUsers);
+      }
     </script>
-</body>
+  </body>
 </html>
